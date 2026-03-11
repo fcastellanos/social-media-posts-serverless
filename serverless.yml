@@ -1,0 +1,95 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: fcastellanos
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: aws-node-http-api-app
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: aws-node-http-api-project
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  environment:
+    PROPERTIES_TABLE_NAME: ${self:service}-properties-table
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:Scan
+            - dynamodb:Query
+            - dynamodb:GetItem
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:*:table/${self:service}-properties-table
+            - arn:aws:dynamodb:${aws:region}:*:table/${self:service}-properties-table/index/*
+  # Uncomment to easily set up a custom domain. Read the docs for more details:
+  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
+  # domain: api.example.com
+
+functions:
+  createPost:
+    handler: src/handlers/createPost.handler
+    events:
+      - httpApi:
+          path: /posts
+          method: post
+  createProperty:
+    handler: src/handlers/createProperty.handler
+    events:
+      - httpApi:
+          path: /properties
+          method: post
+  listProperties:
+    handler: src/handlers/listProperties.handler
+    events:
+      - httpApi:
+          path: /properties
+          method: get
+  listPosts:
+    handler: src/handlers/listPosts.handler
+    events:
+      - httpApi:
+          path: /posts
+          method: get
+
+# Using Serverless v4 built-in esbuild (no external plugin)
+
+resources:
+  Resources:
+    PropertiesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-properties-table
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: entityType
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        BillingMode: PROVISIONED
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        GlobalSecondaryIndexes:
+          - IndexName: EntityTypeIndex
+            KeySchema:
+              - AttributeName: entityType
+                KeyType: HASH
+              - AttributeName: SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+  Outputs:
+    PropertiesTableName:
+      Value: !Ref PropertiesTable
+      Export:
+        Name: ${self:service}-properties-table-name

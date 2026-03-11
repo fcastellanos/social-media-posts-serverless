@@ -1,0 +1,41 @@
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+.env.local
+
+# Serverless / build outputs
+.serverless/
+.serverless_build/
+dist/
+
+# IDE/editor folders
+.vscode/
+.idea/
+
+# AWS credentials
+.aws/credentials
+
+# Logs
+*.log
+
+# Keys / certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Coverage
+coverage/
+
+# Optional: lockfiles (keep if you commit)
+# package-lock.json
+# yarn.lock
+node_modules
+.serverless

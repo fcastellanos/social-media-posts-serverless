@@ -1,0 +1,29 @@
+{
+  "name": "aws-node-http-api-project",
+  "version": "1.0.0",
+  "description": "Serverless Node HTTP API project",
+  
+  "scripts": {
+    "build": "serverless package --package ./.serverless_build",
+    "deploy": "serverless deploy",
+    "offline": "serverless offline",
+    "start": "serverless offline",
+    "dev": "serverless offline --stage dev",
+    "test": "vitest"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.114",
+    "@types/uuid": "^9.0.1",
+    "@types/node": "^18.0.0",
+    "esbuild": "^0.18.0",
+    "typescript": "^5.0.0",
+    "vitest": "^0.34.0"
+  }
+}
