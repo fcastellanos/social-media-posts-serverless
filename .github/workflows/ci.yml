@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20, 24]
+        node-version: [24]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
         run: mkdir -p test-results
 
       - name: Run unit tests (produce junit)
-        run: npm test -- --reporter=junit --outputFile=./test-results/junit-${{ matrix.node-version }}.xml
+        run: npm run test:ci -- --reporter=junit --outputFile=./test-results/junit-${{ matrix.node-version }}.xml
 
       - name: Show junit file
         if: always()
