@@ -2,15 +2,17 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [ main, master ]
   pull_request:
-    branches: [main, master]
+    branches: [ main, master ]
+
+# Opt into Node.js 24 for JavaScript actions to avoid deprecation warnings
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     strategy:
       matrix:
         node-version: [18, 20]
@@ -37,8 +39,8 @@ jobs:
       - name: Make test-results dir
         run: mkdir -p test-results
 
-      - name: Run unit tests
-        run: npm test
+      - name: Run unit tests (produce junit)
+        run: npm test -- --reporter=junit --outputFile=./test-results/junit.xml
 
       - name: Upload test results (vitest JUnit)
         if: always()
