@@ -2,13 +2,15 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     strategy:
       matrix:
         node-version: [18, 20]
@@ -32,12 +34,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Make test-results dir
+        run: mkdir -p test-results
+
       - name: Run unit tests
-        run: npm test -- --reporter=default
+        run: npm test
 
       - name: Upload test results (vitest JUnit)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: vitest-junit
-          path: ./test-results || ./junit.xml || ''
+          path: ./test-results/junit.xml
