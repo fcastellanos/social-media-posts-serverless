@@ -7,7 +7,7 @@ service: aws-node-http-api-project
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs24.x
   environment:
     PROPERTIES_TABLE_NAME: ${self:service}-properties-table
   iam:
