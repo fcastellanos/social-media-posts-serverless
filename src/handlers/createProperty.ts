@@ -15,7 +15,7 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
     if (!event.body) return badRequest('Missing body');
 
     const body = JSON.parse(event.body);
-    const required = ['address', 'city', 'latitude', 'longitude', 'name', 'state', 'zip'];
+    const required = ['address', 'title', 'lat', 'lng'];
     for (const key of required) {
       if (body[key] === undefined) return badRequest(`Missing ${key}`);
     }
@@ -26,20 +26,26 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
       SK: `METADATA#${id}`,
       entityType: 'PROPERTY',
       propertyId: id,
+      title: body.title,
       address: body.address,
-      city: body.city,
-      latitude: body.latitude,
-      longitude: body.longitude,
-      name: body.name,
-      state: body.state,
-      zip: body.zip,
+      lat: body.lat,
+      lng: body.lng,
+      metadata: body.metadata || {},
     };
-
-    if (body.description !== undefined) item.description = body.description;
 
     await docClient.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
 
-    return json(201, item);
+    // return API-shaped object
+    const resp = {
+      id: item.propertyId,
+      title: item.title,
+      address: item.address,
+      lat: item.lat,
+      lng: item.lng,
+      metadata: item.metadata,
+    };
+
+    return json(201, resp);
   } catch (err: any) {
     return internalError(err);
   }

@@ -19,7 +19,16 @@ export const handler = async (_event: APIGatewayProxyEventV2): Promise<APIGatewa
       ExpressionAttributeValues: { ':ptype': 'PROPERTY' },
     }));
 
-    return json(200, resp.Items || []);
+    const items = (resp.Items || []).map((it: any) => ({
+      id: it.propertyId,
+      title: it.title || it.name || null,
+      address: it.address || null,
+      lat: it.lat ?? it.latitude ?? null,
+      lng: it.lng ?? it.longitude ?? null,
+      metadata: it.metadata || {},
+    }));
+
+    return json(200, items);
   } catch (err: any) {
     return internalError(err);
   }

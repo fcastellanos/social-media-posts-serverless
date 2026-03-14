@@ -15,7 +15,7 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
     if (!event.body) return badRequest('Missing body');
 
     const body = JSON.parse(event.body);
-    const required = ['title', 'content'];
+    const required = ['body'];
     for (const key of required) {
       if (body[key] === undefined) return badRequest(`Missing ${key}`);
     }
@@ -26,17 +26,25 @@ export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGateway
       SK: `METADATA#${id}`,
       entityType: 'POST',
       postId: id,
-      title: body.title,
-      content: body.content,
+      body: body.body,
       createdAt: new Date().toISOString(),
     };
 
-    if (body.propertyId) item.propertyId = body.propertyId;
-    if (Array.isArray(body.photos)) item.photos = body.photos.map((p: any) => ({ url: p.url, caption: p.caption || null }));
+    if (body.property && body.property.id) item.propertyId = body.property.id;
+    if (Array.isArray(body.photos)) item.photos = body.photos.map((p: any, idx: number) => ({ id: p.id ?? `${id}-p${idx+1}`, url: p.url }));
+    if (body.scheduled_at) item.scheduledAt = body.scheduled_at;
 
     await docClient.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
 
-    return json(201, item);
+    const resp = {
+      id: item.postId,
+      body: item.body,
+      photos: item.photos || [],
+      property: item.propertyId ? { id: item.propertyId } : null,
+      scheduled_at: item.scheduledAt || null,
+    };
+
+    return json(201, resp);
   } catch (err: any) {
     return internalError(err);
   }

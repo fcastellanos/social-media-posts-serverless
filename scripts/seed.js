@@ -155,7 +155,12 @@ const examplePosts = [
 ];
 
 async function ensureProperty(item) {
-  const id = stableId(item.name, item.address);
+  const title = item.title || item.name;
+  const lat = item.lat ?? item.latitude;
+  const lng = item.lng ?? item.longitude;
+  const metadata = item.metadata || {};
+
+  const id = stableId(title, item.address);
   const PK = `PROPERTY#${id}`;
   const SK = `METADATA#${id}`;
 
@@ -164,8 +169,13 @@ async function ensureProperty(item) {
     SK,
     entityType: 'PROPERTY',
     propertyId: id,
-    name: item.name,
+    title: title,
     address: item.address,
+    lat: lat,
+    lng: lng,
+    metadata: metadata,
+    // legacy fields (kept for compatibility)
+    name: item.name,
     city: item.city,
     state: item.state,
     zip: item.zip,
@@ -209,12 +219,13 @@ async function ensurePost(post, propertyMap) {
     entityType: 'POST',
     postId: id,
     title: post.title,
-    content: post.content,
+    body: post.content,
     createdAt: new Date().toISOString(),
   };
 
   if (post.propertyName && propertyMap[post.propertyName]) item.propertyId = propertyMap[post.propertyName];
-  if (post.photos) item.photos = post.photos;
+  if (post.photos) item.photos = post.photos.map(p => ({ id: stableId(post.title, p.url), url: p.url }));
+  if (post.scheduled_at) item.scheduledAt = post.scheduled_at;
 
   if (DRY) {
     console.log('DRY RUN - post:', item);
