@@ -1,5 +1,7 @@
 # aws-node-http-api-project
 
+[![CI](https://github.com/fcastellanos/social-media-posts-serverless/actions/workflows/ci.yml/badge.svg)](https://github.com/fcastellanos/social-media-posts-serverless/actions/workflows/ci.yml)
+
 This project is a Serverless Framework (v4) Node.js HTTP API for AWS using TypeScript Lambda handlers and DynamoDB for persistence.
 
 Summary
@@ -14,9 +16,11 @@ Summary
 
 Repository layout
 
-- `src/handlers/` — TypeScript Lambda handlers
-- `test/` — Vitest unit tests (handlers are unit-tested with DynamoDB mocked)
-- `serverless.yml` — Serverless config, resources and IAM role statements
+- `src/handlers/` — TypeScript Lambda handlers (one small file per function)
+- `src/lib/` — shared business logic and the central `repository.ts` data layer
+- `scripts/` — helper scripts (seed data, export payloads)
+- `test/` — Vitest unit tests (handlers and `src/lib` are unit-tested with DynamoDB mocked)
+- `serverless.yml` — Serverless config, functions, resources and IAM role statements
 - `tsconfig.json` — TypeScript config
 - `package.json` — scripts and dependencies
 
@@ -53,8 +57,10 @@ serverless deploy
 Notes
 
 - DynamoDB table: created by the CloudFormation template in `serverless.yml`. The table name is `${self:service}-properties-table`. The `PROPERTIES_TABLE_NAME` environment variable is set for Lambdas.
-- Tests: unit tests mock `@aws-sdk/lib-dynamodb` and run with Vitest. See `test/` for examples.
-- Request validation: handlers perform simple required-field checks. `description` on properties is optional.
+- Data layer: `src/lib/repository.ts` centralizes DynamoDB access and maps DB items to API shapes. Handlers call the repository for CRUD operations.
+- Tests: unit tests mock `@aws-sdk/lib-dynamodb` and run with Vitest. Tests now include handler tests and repository tests. Run `npm test` or `npm run test:ci` for non-interactive runs.
+- Coverage: a `test:coverage` script is available; CI can use `c8` or upgrade Vitest to a 4.x line to use `@vitest/coverage-v8` for V8-based coverage reporting. Locally we use `npx c8 --reporter=text npm run test:ci` as a workaround.
+- Request validation: handlers perform simple required-field checks. `metadata`/`description` on properties is optional.
 
 Local setup
 
@@ -106,8 +112,17 @@ Then set the `ENDPOINT` environment variable and update handlers to connect to `
 # install deps
 npm install
 
-# run unit tests
+# run unit tests (interactive)
 npm test
+
+# run unit tests (CI / non-interactive)
+npm run test:ci
+
+# run typescript check / lint
+npm run lint
+
+# run coverage (local workaround using c8)
+npx c8 --reporter=text npm run test:ci
 
 # start local dev (serverless offline)
 npm run start
@@ -118,8 +133,3 @@ serverless package
 # deploy to AWS (uses current AWS_PROFILE/AWS_REGION)
 serverless deploy
 ```
-
-Security
-
-- Avoid committing credentials or `.env` files. A `.gitignore` has been added.
-- If a secret is accidentally committed, rotate it immediately and remove it from git history (e.g., `git filter-repo` or `bfg`).
