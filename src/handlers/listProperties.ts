@@ -1,33 +1,10 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { json, internalError } from '../lib/http';
-
-const REGION = process.env.AWS_REGION || 'us-east-1';
-const TABLE_NAME = process.env.PROPERTIES_TABLE_NAME || `${process.env.SERVERLESS_SERVICE || 'service'}-properties-table`;
-
-const client = new DynamoDBClient({ region: REGION });
-const docClient = DynamoDBDocumentClient.from(client);
+import * as repo from '../lib/repository';
 
 export const handler = async (_event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
   try {
-    const resp = await docClient.send(new QueryCommand({
-      TableName: TABLE_NAME,
-      IndexName: 'EntityTypeIndex',
-      KeyConditionExpression: '#et = :ptype',
-      ExpressionAttributeNames: { '#et': 'entityType' },
-      ExpressionAttributeValues: { ':ptype': 'PROPERTY' },
-    }));
-
-    const items = (resp.Items || []).map((it: any) => ({
-      id: it.propertyId,
-      title: it.title || it.name || null,
-      address: it.address || null,
-      lat: it.lat ?? it.latitude ?? null,
-      lng: it.lng ?? it.longitude ?? null,
-      metadata: it.metadata || {},
-    }));
-
+    const items = await repo.listProperties();
     return json(200, items);
   } catch (err: any) {
     return internalError(err);

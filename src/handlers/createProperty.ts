@@ -1,51 +1,24 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
-import { v4 as uuidv4 } from 'uuid';
 import { json, badRequest, internalError } from '../lib/http';
-
-const REGION = process.env.AWS_REGION || 'us-east-1';
-const TABLE_NAME = process.env.PROPERTIES_TABLE_NAME || `${process.env.SERVERLESS_SERVICE || 'service'}-properties-table`;
-
-const client = new DynamoDBClient({ region: REGION });
-const docClient = DynamoDBDocumentClient.from(client);
+import * as repo from '../lib/repository';
 
 export const handler = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
   try {
     if (!event.body) return badRequest('Missing body');
 
     const body = JSON.parse(event.body);
-    const required = ['address', 'title', 'lat', 'lng'];
-    for (const key of required) {
-      if (body[key] === undefined) return badRequest(`Missing ${key}`);
-    }
+    if (body.address === undefined) return badRequest('Missing address');
+    if (body.title === undefined && body.name === undefined) return badRequest('Missing title');
+    if (body.lat === undefined && body.latitude === undefined) return badRequest('Missing lat');
+    if (body.lng === undefined && body.longitude === undefined) return badRequest('Missing lng');
 
-    const id = uuidv4();
-    const item: any = {
-      PK: `PROPERTY#${id}`,
-      SK: `METADATA#${id}`,
-      entityType: 'PROPERTY',
-      propertyId: id,
-      title: body.title,
-      address: body.address,
-      lat: body.lat,
-      lng: body.lng,
-      metadata: body.metadata || {},
-    };
+    const title = body.title || body.name;
+    const lat = body.lat ?? body.latitude;
+    const lng = body.lng ?? body.longitude;
 
-    await docClient.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
-
-    // return API-shaped object
-    const resp = {
-      id: item.propertyId,
-      title: item.title,
-      address: item.address,
-      lat: item.lat,
-      lng: item.lng,
-      metadata: item.metadata,
-    };
-
-    return json(201, resp);
+    const prop = await repo.createProperty({ title, address: body.address, lat, lng, metadata: body.metadata });
+    if (prop && (prop as any).id && !(prop as any).propertyId) (prop as any).propertyId = (prop as any).id;
+    return json(201, prop);
   } catch (err: any) {
     return internalError(err);
   }
