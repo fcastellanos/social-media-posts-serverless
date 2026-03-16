@@ -13,8 +13,8 @@ export type Property = {
   id: string;
   title: string | null;
   address: string | null;
-  lat: number | null;
-  lng: number | null;
+  latitude: number | null;
+  longitude: number | null;
   metadata: any;
 };
 
@@ -42,8 +42,8 @@ function mapPropertyItem(it: any): Property | null {
     id: it.propertyId,
     title: it.title || it.name || null,
     address: it.address || null,
-    lat: typeof it.lat === 'number' ? it.lat : (typeof it.latitude === 'number' ? it.latitude : null),
-    lng: typeof it.lng === 'number' ? it.lng : (typeof it.longitude === 'number' ? it.longitude : null),
+    latitude: typeof it.latitude === 'number' ? it.latitude : null,
+    longitude: typeof it.longitude === 'number' ? it.longitude : null,
     metadata: it.metadata || {},
   };
 }
@@ -79,7 +79,7 @@ export async function getProperty(id: string): Promise<Property | null> {
   return mapPropertyItem(resp.Item);
 }
 
-export async function createProperty(data: { title: string; address: string; lat: number; lng: number; metadata?: any }): Promise<Property> {
+export async function createProperty(data: { title: string; address: string; latitude: number; longitude: number; metadata?: any }): Promise<Property> {
   const id = uuidv4();
   const item: any = {
     PK: `PROPERTY#${id}`,
@@ -88,8 +88,8 @@ export async function createProperty(data: { title: string; address: string; lat
     propertyId: id,
     title: data.title,
     address: data.address,
-    lat: data.lat,
-    lng: data.lng,
+    latitude: data.latitude,
+    longitude: data.longitude,
     metadata: data.metadata || {},
   };
 

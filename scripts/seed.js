@@ -156,8 +156,8 @@ const examplePosts = [
 
 async function ensureProperty(item) {
   const title = item.title || item.name;
-  const lat = item.lat ?? item.latitude;
-  const lng = item.lng ?? item.longitude;
+  const latitude = item.latitude;
+  const longitude = item.longitude;
   const metadata = item.metadata || {};
 
   const id = stableId(title, item.address);
@@ -171,16 +171,14 @@ async function ensureProperty(item) {
     propertyId: id,
     title: title,
     address: item.address,
-    lat: lat,
-    lng: lng,
+    latitude: latitude,
+    longitude: longitude,
     metadata: metadata,
     // legacy fields (kept for compatibility)
     name: item.name,
     city: item.city,
     state: item.state,
     zip: item.zip,
-    latitude: item.latitude,
-    longitude: item.longitude,
   };
 
   if (DRY) {
