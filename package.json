@@ -9,7 +9,9 @@
     "start": "serverless offline",
     "dev": "serverless offline --stage dev",
     "test": "vitest",
-    "test:ci": "vitest --run"
+    "test:ci": "vitest --run",
+    "lint": "tsc --noEmit",
+    "test:coverage": "vitest --run --coverage"
   },
   "author": "",
   "license": "MIT",
@@ -22,6 +24,7 @@
     "@types/aws-lambda": "^8.10.114",
     "@types/node": "^18.0.0",
     "@types/uuid": "^9.0.1",
+    "c8": "^11.0.0",
     "esbuild": "^0.18.0",
     "serverless": "^4.33.0",
     "typescript": "^5.0.0",
