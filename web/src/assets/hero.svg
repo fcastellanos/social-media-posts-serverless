@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400" role="img" aria-label="House placeholder">
+  <defs>
+    <style> .bg { fill: #f3f4f6 } .stroke { stroke: #111827; stroke-opacity: 0.12; stroke-width: 2 } .fill { fill: #9CA3AF } .door { fill: #111827 } </style>
+  </defs>
+  <rect class="bg" width="600" height="400" rx="16"/>
+  <g transform="translate(150,90)">
+    <!-- house body -->
+    <rect x="60" y="80" width="220" height="140" rx="8" class="fill"/>
+    <!-- roof -->
+    <polygon points="40,80 190,10 340,80" class="stroke" fill="#111827" fill-opacity="0.08"/>
+    <!-- door -->
+    <rect x="170" y="150" width="40" height="70" rx="4" class="door"/>
+    <!-- window left -->
+    <rect x="90" y="110" width="40" height="34" rx="4" fill="#ffffff" stroke="#000" stroke-opacity="0.06"/>
+    <!-- window right -->
+    <rect x="270" y="110" width="40" height="34" rx="4" fill="#ffffff" stroke="#000" stroke-opacity="0.06"/>
+  </g>
+</svg>

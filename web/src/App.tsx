@@ -1,6 +1,7 @@
-import React from 'react'
 import './App.css'
 import PostsList from './components/PostsList'
+import PostDetail from './components/PostDetail'
+import { HashRouter, Routes, Route, useParams } from 'react-router-dom'
 
 function App() {
   return (
@@ -11,10 +12,21 @@ function App() {
       </header>
 
       <main>
-        <PostsList />
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<PostsList />} />
+            <Route path="/posts/:id" element={<PostDetailRoute />} />
+          </Routes>
+        </HashRouter>
       </main>
     </div>
   )
+}
+
+function PostDetailRoute() {
+  const params = useParams()
+  const id = params?.id
+  return id ? <PostDetail id={id} /> : <PostsList />
 }
 
 export default App

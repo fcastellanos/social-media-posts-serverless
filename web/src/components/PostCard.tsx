@@ -1,6 +1,7 @@
 import './posts.css'
-import heroImg from '../assets/hero.png'
+import heroImg from '../assets/hero.svg'
 import type { Post } from '../lib/api'
+import { Link } from 'react-router-dom'
 
 export default function PostCard({ post }: { post: Post }) {
   // Image handling simplified: API returns full URLs for images.
@@ -14,7 +15,9 @@ export default function PostCard({ post }: { post: Post }) {
   const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ''
 
   return (
-    <article className="post-card">
+    <Link className="post-link" to={`/posts/${encodeURIComponent(post.id)}`}>
+      <article className="post-card">
+      {post.property && <span className="property-overlay badge">Property</span>}
       <div className="post-image">
         <img
           src={img}
@@ -32,8 +35,8 @@ export default function PostCard({ post }: { post: Post }) {
         <div className="post-meta">{date}</div>
         <h3 className="post-title">{post.title || 'Untitled post'}</h3>
         <p className="post-excerpt">{post.excerpt || post.body || 'No description provided.'}</p>
-        {post.propertyId && <span className="badge">Property</span>}
       </div>
-    </article>
+      </article>
+    </Link>
   )
 }

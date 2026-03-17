@@ -34,7 +34,7 @@ export type PostApi = {
   title?: string | null;
   body: string | null;
   photos: Photo[];
-  property: { id: string; address?: string | null } | null;
+  property: { id: string; address?: string | null; title?: string | null } | null;
   scheduled_at?: string | null;
 };
 
@@ -114,13 +114,14 @@ export async function listPosts(): Promise<PostApi[]> {
   const posts = (resp.Items || []).map(mapPostItem).filter((p): p is PostItem => p != null);
 
   // collect unique propertyIds and batch-get them
-  const propIds = Array.from(new Set(posts.filter(p => p.propertyId).map(p => p.propertyId)));
-  const propertyMap: Record<string, Property | null> = {};
+  const propIds = Array.from(new Set(posts.map(p => p.propertyId).filter(Boolean))) as string[];
+  let propertyMap: Record<string, Property | null> = {};
   if (propIds.length > 0) {
     const keys = propIds.map(id => ({ PK: `PROPERTY#${id}`, SK: `METADATA#${id}` }));
     const batchResp: any = await docClient.send(new BatchGetCommand({ RequestItems: { [TABLE_NAME]: { Keys: keys } } }));
     const items = (batchResp.Responses && batchResp.Responses[TABLE_NAME]) || [];
-    for (const it of items) propertyMap[it.propertyId] = mapPropertyItem(it);
+    const mapped = (items.map(mapPropertyItem) as Array<Property | null>).filter((x): x is Property => !!x);
+    propertyMap = Object.fromEntries(mapped.map(p => [p.id, p]));
   }
 
   return posts.map(p => ({
@@ -128,7 +129,9 @@ export async function listPosts(): Promise<PostApi[]> {
     title: p.title || null,
     body: p.body,
     photos: p.photos || [],
-    property: p.propertyId ? (propertyMap[p.propertyId] ? { id: propertyMap[p.propertyId]!.id, address: propertyMap[p.propertyId]!.address } : { id: p.propertyId }) : null,
+    property: p.propertyId ? (propertyMap[p.propertyId]
+      ? { id: propertyMap[p.propertyId]!.id, address: propertyMap[p.propertyId]!.address, title: propertyMap[p.propertyId]!.title }
+      : { id: p.propertyId, title: null }) : null,
     scheduled_at: p.scheduled_at || null,
   }));
 }
@@ -197,7 +200,14 @@ export async function getPost(id: string): Promise<PostApi | null> {
   if (!p) return null;
   if (p.propertyId) {
     const prop = await getProperty(p.propertyId);
-    return { id: p.id, title: p.title || null, body: p.body, photos: p.photos || [], property: prop ? { id: prop.id, address: prop.address } : { id: p.propertyId }, scheduled_at: p.scheduled_at };
+    return {
+      id: p.id,
+      title: p.title || null,
+      body: p.body,
+      photos: p.photos || [],
+      property: prop ? { id: prop.id, address: prop.address, title: prop.title } : { id: p.propertyId, title: null },
+      scheduled_at: p.scheduled_at,
+    };
   }
   return { id: p.id, title: p.title || null, body: p.body, photos: p.photos || [], property: null, scheduled_at: p.scheduled_at };
 }

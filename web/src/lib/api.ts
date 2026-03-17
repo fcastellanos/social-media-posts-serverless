@@ -3,8 +3,8 @@ export type Post = {
   title: string
   body?: string
   excerpt?: string
-  propertyId?: string
-  photos?: string[]
+  property?: { id: string; address?: string; title?: string }
+  photos?: Array<string | { id?: string; url?: string }>
   createdAt?: string
 }
 
