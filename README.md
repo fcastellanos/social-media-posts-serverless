@@ -4,13 +4,15 @@
 
 This project is a Serverless Framework (v4) Node.js HTTP API for AWS using TypeScript Lambda handlers and DynamoDB for persistence.
 
-Summary
+- Summary
 
-- Four API endpoints implemented as AWS Lambda functions (TypeScript):
+- API endpoints implemented as AWS Lambda functions (TypeScript):
   - POST /properties — create a Property (description is optional)
   - GET /properties — list Properties (queries a GSI)
+  - GET /properties/{id} — get a single Property by id (returns 404 if missing)
   - POST /posts — create a Social Media Post (can reference a property, include photos)
   - GET /posts — list Posts (queries a GSI)
+  - GET /posts/{id} — get a single Post by id (returns 404 if missing)
 - Single DynamoDB table: `${self:service}-properties-table` with a Global Secondary Index `EntityTypeIndex` on `entityType` + `SK` for efficient listing.
 - Responses include `Content-Type: application/json` so API Gateway returns JSON.
 
@@ -52,6 +54,43 @@ serverless package
 
 # deploy to AWS
 serverless deploy
+```
+
+## API Endpoints
+
+The HTTP API exposes the following endpoints. Replace `<api-id>` and `<region>` with your deployed API Gateway values or use the custom domain you configure.
+
+- GET /posts — list posts
+- GET /posts/{id} — get a single post by id (returns 404 if missing)
+- POST /posts — create a post
+- GET /properties — list properties
+- GET /properties/{id} — get a single property by id (returns 404 if missing)
+- POST /properties — create a property
+
+Example curl requests (replace placeholders):
+
+```bash
+# List posts
+curl -sS https://<api-id>.execute-api.<region>.amazonaws.com/posts
+
+# Get a single post
+curl -sS https://<api-id>.execute-api.<region>.amazonaws.com/posts/<POST_ID>
+
+# List properties
+curl -sS https://<api-id>.execute-api.<region>.amazonaws.com/properties
+
+# Get a single property
+curl -sS https://<api-id>.execute-api.<region>.amazonaws.com/properties/<PROPERTY_ID>
+
+# Create a post (example)
+curl -sS -X POST https://<api-id>.execute-api.<region>.amazonaws.com/posts \
+  -H 'Content-Type: application/json' \
+  -d '{"body":"Hello","propertyId":"p1"}'
+
+# Create a property (example)
+curl -sS -X POST https://<api-id>.execute-api.<region>.amazonaws.com/properties \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"My Place","address":"123 Main St","latitude":1,"longitude":2}'
 ```
 
 ## Seeding & Clearing Data
