@@ -186,6 +186,7 @@ This repository includes a small frontend app under `web/` used for local develo
 Screenshot (preview of the Posts feed):
 
 ![Posts screenshot](web/public/posts-screenshot.png)
+![Post Details screenshot](web/public/post-details-screenshot.png)
 
 Notes
 

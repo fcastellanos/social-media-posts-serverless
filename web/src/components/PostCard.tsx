@@ -14,6 +14,14 @@ export default function PostCard({ post }: { post: Post }) {
   const img = candidate && (/^https?:\/\//i.test(candidate) || candidate.startsWith('data:')) ? candidate : heroImg
   const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ''
 
+  const truncate = (text: string | null | undefined, n = 150) => {
+    if (!text) return text
+    if (text.length <= n) return text
+    const sub = text.slice(0, n)
+    const idx = sub.lastIndexOf(' ')
+    return (idx > 0 ? sub.slice(0, idx) : sub).trim() + '…'
+  }
+
   return (
     <Link className="post-link" to={`/posts/${encodeURIComponent(post.id)}`}>
       <article className="post-card">
@@ -34,7 +42,7 @@ export default function PostCard({ post }: { post: Post }) {
       <div className="post-body">
         <div className="post-meta">{date}</div>
         <h3 className="post-title">{post.title || 'Untitled post'}</h3>
-        <p className="post-excerpt">{post.excerpt || post.body || 'No description provided.'}</p>
+        <p className="post-excerpt">{truncate(post.excerpt || post.body || 'No description provided.', 150)}</p>
       </div>
       </article>
     </Link>
