@@ -54,6 +54,85 @@ serverless package
 serverless deploy
 ```
 
+## Seeding & Clearing Data
+
+- The project provides two safe ways to run seeds:
+  - Locally via `scripts/seed.js` (dry-run supported)
+  - In AWS via an admin Lambda `adminSeeder` invoked with `serverless invoke` (recommended for running against deployed table)
+
+Environment variables and actions (local script):
+
+- `RUN_SEEDS=true` — allow the local seed script to run (safety guard)
+- `SEED_ACTION` — which action to run (default: `create`). Supported values: `create`, `clear:posts`, `clear:properties`, `clear:all`/`clear:table`
+- `DRY_RUN=true` — show what would happen without performing destructive writes
+- `FORCE=true` — skip the interactive confirmation when deleting (use with care)
+
+Examples (local dry-run / manual run):
+
+```bash
+# Local dry-run creating items (no AWS creds required)
+npm run seed:dry
+
+# Local create (requires PROPERTIES_TABLE_NAME and valid AWS creds in env)
+PROPERTIES_TABLE_NAME=your-table RUN_SEEDS=true SEED_ACTION=create npm run seed
+
+# Local dry-run clearing all items
+PROPERTIES_TABLE_NAME=your-table RUN_SEEDS=true SEED_ACTION=clear:all DRY_RUN=true npm run seed:dry
+
+# Local force delete (non-interactive)
+PROPERTIES_TABLE_NAME=your-table RUN_SEEDS=true SEED_ACTION=clear:properties FORCE=true npm run seed:clear:properties
+```
+
+Examples (invoke admin Lambda in AWS — recommended for deployed tables):
+
+```bash
+# Dry-run in AWS (no destructive writes)
+npm run invoke:seed:dry
+
+# Run create in AWS
+npm run invoke:seed:create
+
+# Force delete everything in AWS
+npm run invoke:seed
+```
+
+More `serverless invoke` examples and variants:
+
+```bash
+# Invoke directly with a custom payload (clear posts, require --data JSON)
+serverless invoke -f adminSeeder --data '{"action":"clear:posts","force":true}'
+
+# Use a file for the event payload (helpful for complex payloads)
+serverless invoke -f adminSeeder --path ./scripts/seeds.json
+
+# Invoke the function locally (runs the handler in your local environment)
+serverless invoke local -f adminSeeder --data '{"action":"create"}'
+
+# AWS CLI example (invoke deployed Lambda by name; replace <FUNCTION_NAME>)
+# writes output to response.json
+aws lambda invoke --function-name <FUNCTION_NAME> --payload '{"action":"create"}' response.json
+
+# Or use the npm helper scripts (preferred for consistent payloads)
+npm run invoke:seed:dry    # dry-run
+npm run invoke:seed:create # create
+npm run invoke:seed        # clear:all + force
+npm run invoke:seed:create:dry         # create (dry-run)
+npm run invoke:seed:clear:posts        # clear posts
+npm run invoke:seed:clear:posts:dry    # clear posts (dry-run)
+npm run invoke:seed:clear:posts:force  # clear posts (force)
+npm run invoke:seed:clear:properties   # clear properties
+npm run invoke:seed:clear:properties:dry # clear properties (dry-run)
+npm run invoke:seed:clear:properties:force # clear properties (force)
+npm run invoke:seed:clear:all         # clear all (no force)
+npm run invoke:seed:clear:all:dry     # clear all (dry-run)
+npm run invoke:seed:clear:all:force   # clear all (force)
+```
+
+Notes:
+
+- The admin seeder Lambda runs in AWS and inherits IAM permissions from the function role; prefer this for operations against the deployed table.
+- The local script uses the AWS SDK default provider chain; ensure your shell has credentials (`AWS_PROFILE`, `AWS_ACCESS_KEY_ID`, etc.) when running non-dry operations locally.
+
 Notes
 
 - DynamoDB table: created by the CloudFormation template in `serverless.yml`. The table name is `${self:service}-properties-table`. The `PROPERTIES_TABLE_NAME` environment variable is set for Lambdas.

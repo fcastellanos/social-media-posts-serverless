@@ -1,5 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, QueryCommand, GetCommand, PutCommand, BatchGetCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, QueryCommand, GetCommand, PutCommand, BatchGetCommand, ScanCommand, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 const REGION = process.env.AWS_REGION || 'us-east-1';
@@ -79,8 +79,8 @@ export async function getProperty(id: string): Promise<Property | null> {
   return mapPropertyItem(resp.Item);
 }
 
-export async function createProperty(data: { title: string; address: string; latitude: number; longitude: number; metadata?: any }): Promise<Property> {
-  const id = uuidv4();
+export async function createProperty(data: { title: string; address: string; latitude: number; longitude: number; metadata?: any }, opts?: { id?: string }): Promise<Property> {
+  const id = opts && opts.id ? opts.id : uuidv4();
   const item: any = {
     PK: `PROPERTY#${id}`,
     SK: `METADATA#${id}`,
@@ -129,6 +129,62 @@ export async function listPosts(): Promise<PostApi[]> {
   }));
 }
 
+export async function removeAllByEntity(entityType: string, opts?: { dryRun?: boolean }): Promise<number> {
+  const keys: Array<{ PK: string; SK: string }> = [];
+  let ExclusiveStartKey: any = undefined;
+  do {
+    const resp: any = await docClient.send(new QueryCommand({
+      TableName: TABLE_NAME,
+      IndexName: 'EntityTypeIndex',
+      KeyConditionExpression: '#et = :ptype',
+      ExpressionAttributeNames: { '#et': 'entityType' },
+      ExpressionAttributeValues: { ':ptype': entityType },
+      ExclusiveStartKey,
+      ProjectionExpression: 'PK, SK',
+    }));
+    for (const it of (resp.Items || [])) keys.push({ PK: it.PK, SK: it.SK });
+    ExclusiveStartKey = resp.LastEvaluatedKey;
+  } while (ExclusiveStartKey);
+
+  if (opts && opts.dryRun) {
+    // return count for dry run
+    return keys.length;
+  }
+
+  if (keys.length === 0) return 0;
+
+  for (let i = 0; i < keys.length; i += 25) {
+    const chunk = keys.slice(i, i + 25);
+    const RequestItems: any = {};
+    RequestItems[TABLE_NAME] = chunk.map(k => ({ DeleteRequest: { Key: { PK: k.PK, SK: k.SK } } }));
+    await docClient.send(new BatchWriteCommand({ RequestItems }));
+  }
+
+  return keys.length;
+}
+
+export async function removeAllFromTable(opts?: { dryRun?: boolean }): Promise<number> {
+  const keys: Array<{ PK: string; SK: string }> = [];
+  let ExclusiveStartKey: any = undefined;
+  do {
+    const resp: any = await docClient.send(new ScanCommand({ TableName: TABLE_NAME, ExclusiveStartKey, ProjectionExpression: 'PK, SK' }));
+    for (const it of (resp.Items || [])) keys.push({ PK: it.PK, SK: it.SK });
+    ExclusiveStartKey = resp.LastEvaluatedKey;
+  } while (ExclusiveStartKey);
+
+  if (opts && opts.dryRun) return keys.length;
+  if (keys.length === 0) return 0;
+
+  for (let i = 0; i < keys.length; i += 25) {
+    const chunk = keys.slice(i, i + 25);
+    const RequestItems: any = {};
+    RequestItems[TABLE_NAME] = chunk.map(k => ({ DeleteRequest: { Key: { PK: k.PK, SK: k.SK } } }));
+    await docClient.send(new BatchWriteCommand({ RequestItems }));
+  }
+
+  return keys.length;
+}
+
 export async function getPost(id: string): Promise<PostApi | null> {
   const PK = `POST#${id}`;
   const SK = `METADATA#${id}`;
@@ -152,6 +208,13 @@ export async function createPost(data: { body: string; photos?: Array<{ url: str
     body: data.body,
     createdAt: new Date().toISOString(),
   };
+  // Allow callers to set an explicit id via a reserved field in data (internal use)
+  // If caller provided `data._id` we'll use it (not part of public API)
+  if ((data as any)._id) {
+    item.postId = (data as any)._id;
+    item.PK = `POST#${(data as any)._id}`;
+    item.SK = `METADATA#${(data as any)._id}`;
+  }
   if (data.propertyId) item.propertyId = data.propertyId;
   if (Array.isArray(data.photos)) item.photos = data.photos.map((p, idx) => ({ id: p.id || `${id}-p${idx+1}`, url: p.url }));
   if (data.scheduled_at) item.scheduledAt = data.scheduled_at;

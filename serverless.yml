@@ -16,6 +16,8 @@ provider:
         - Effect: Allow
           Action:
             - dynamodb:PutItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
             - dynamodb:Scan
             - dynamodb:Query
             - dynamodb:GetItem
@@ -51,6 +53,11 @@ functions:
       - httpApi:
           path: /posts
           method: get
+
+  adminSeeder:
+    handler: src/handlers/adminSeeder.handler
+    # No HTTP event; invoked manually via `serverless invoke -f adminSeeder` for safety
+    # environment inherits provider.env
 
 # Using Serverless v4 built-in esbuild (no external plugin)
 

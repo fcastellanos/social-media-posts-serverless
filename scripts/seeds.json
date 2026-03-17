@@ -1,0 +1,190 @@
+{
+  "properties": [
+    {
+      "name": "Maple Ridge Flats",
+      "address": "1842 W Juniper Crest Ave",
+      "city": "Northlake Heights",
+      "state": "IL",
+      "zip": "60618",
+      "latitude": 41.954812,
+      "longitude": -87.691443
+    },
+    {
+      "name": "Juniper Court Apartments",
+      "address": "1935 W Pine Hollow St",
+      "city": "Northlake Heights",
+      "state": "IL",
+      "zip": "60618",
+      "latitude": 41.951376,
+      "longitude": -87.68492
+    },
+    {
+      "name": "The Willowline",
+      "address": "2108 N Cedarbank Blvd",
+      "city": "Northlake Heights",
+      "state": "IL",
+      "zip": "60618",
+      "latitude": 41.958225,
+      "longitude": -87.676517
+    },
+    {
+      "name": "Lakeview Terrace Homes",
+      "address": "722 E Ashford Ln",
+      "city": "Northlake Heights",
+      "state": "IL",
+      "zip": "60618",
+      "latitude": 41.946903,
+      "longitude": -87.667284
+    },
+    {
+      "name": "Crestwood Lofts",
+      "address": "1601 N Briarstone Rd",
+      "city": "Northlake Heights",
+      "state": "IL",
+      "zip": "60618",
+      "latitude": 41.962488,
+      "longitude": -87.661901
+    },
+    {
+      "name": "Harbor Point Residences",
+      "address": "905 W Silverleaf Dr",
+      "city": "Northlake Heights",
+      "state": "IL",
+      "zip": "60618",
+      "latitude": 41.944117,
+      "longitude": -87.655632
+    },
+    {
+      "name": "Fulton Grove Apartments",
+      "address": "2480 N Meadowrun Ct",
+      "city": "Northlake Heights",
+      "state": "IL",
+      "zip": "60618",
+      "latitude": 41.969054,
+      "longitude": -87.649875
+    },
+    {
+      "name": "The Alderstone",
+      "address": "1317 W Oakrun Ave",
+      "city": "Northlake Heights",
+      "state": "IL",
+      "zip": "60618",
+      "latitude": 41.957041,
+      "longitude": -87.647112
+    },
+    {
+      "name": "Gaslamp Lofts",
+      "address": "456 5th Ave",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92101",
+      "latitude": 32.7138,
+      "longitude": -117.16
+    },
+    {
+      "name": "La Jolla Cove Apartments",
+      "address": "120 Prospect St",
+      "city": "La Jolla",
+      "state": "CA",
+      "zip": "92037",
+      "latitude": 32.8328,
+      "longitude": -117.2713
+    },
+    {
+      "name": "Pacific Beach Residences",
+      "address": "789 Mission Blvd",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92109",
+      "latitude": 32.7909,
+      "longitude": -117.252
+    },
+    {
+      "name": "Ocean Beach Villas",
+      "address": "1020 Cable St",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92107",
+      "latitude": 32.7503,
+      "longitude": -117.25
+    },
+    {
+      "name": "North Park Commons",
+      "address": "3030 30th St",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92104",
+      "latitude": 32.7348,
+      "longitude": -117.1297
+    },
+    {
+      "name": "Hillcrest Gardens",
+      "address": "402 University Ave",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92103",
+      "latitude": 32.7488,
+      "longitude": -117.1659
+    },
+    {
+      "name": "Mission Valley Place",
+      "address": "210 Rio Vista St",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92108",
+      "latitude": 32.7638,
+      "longitude": -117.1236
+    },
+    {
+      "name": "Coronado Bay Residences",
+      "address": "101 Orange Ave",
+      "city": "Coronado",
+      "state": "CA",
+      "zip": "92118",
+      "latitude": 32.6849,
+      "longitude": -117.1831
+    },
+    {
+      "name": "Little Italy Flats",
+      "address": "225 India St",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92101",
+      "latitude": 32.7229,
+      "longitude": -117.1695
+    },
+    {
+      "name": "Point Loma Harbor Homes",
+      "address": "1601 Rosecrans St",
+      "city": "San Diego",
+      "state": "CA",
+      "zip": "92106",
+      "latitude": 32.6748,
+      "longitude": -117.239
+    }
+  ],
+  "examplePosts": [
+    {
+      "title": "Northlake Heights Charm + Convenience",
+      "content": "Discover Maple Ridge Flats at 1842 W Juniper Crest Ave—an inviting home with a comfortable, light-filled layout and a warm, welcoming feel.\n\nEnjoy a peaceful residential setting while staying close to Northlake Heights parks, local dining, shopping, and convenient commuter routes. Schedule your showing and see this neighborhood gem in person.",
+      "propertyName": "Maple Ridge Flats",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1600&q=80",
+          "caption": "Classic curb appeal in a welcoming neighborhood setting."
+        }
+      ]
+    },
+    {
+      "title": "Quiet Street, City Convenience",
+      "content": "Discover Juniper Court Apartments at 1935 W Pine Hollow St in Northlake Heights (60618)—tucked on a calm residential block with a welcoming neighborhood feel.\n\nEnjoy nearby parks, local dining, and everyday essentials just minutes away, plus easy access to major routes and public transit for a smooth commute around Chicago. Schedule a showing and see it for yourself.",
+      "propertyName": "Juniper Court Apartments",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1600&q=80",
+          "caption": "Bright, comfortable apartment living in a convenient neighborhood setting."
+        }
+      ]
+    }
+  ]
+}
