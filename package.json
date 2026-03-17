@@ -21,7 +21,6 @@
     "seed:clear:properties": "PROPERTIES_TABLE_NAME=$PROPERTIES_TABLE_NAME node -e \"require('./scripts/repository').removeAllProperties().then(r=>console.log('deleted',r))\"",
     "seed:clear:table": "PROPERTIES_TABLE_NAME=$PROPERTIES_TABLE_NAME node -e \"require('./scripts/repository').removeAllFromTable().then(r=>console.log('deleted',r))\"",
     "invoke:seed:dry": "serverless invoke -f adminSeeder --data '{\"action\":\"clear:all\",\"dryRun\":true}'",
-    "invoke:seed": "serverless invoke -f adminSeeder --data '{\"action\":\"clear:all\",\"force\":true}'",
     "invoke:seed:create": "serverless invoke -f adminSeeder --data '{\"action\":\"create\"}'",
     "invoke:seed:create:dry": "serverless invoke -f adminSeeder --data '{\"action\":\"create\",\"dryRun\":true}'",
     "invoke:seed:clear:posts": "serverless invoke -f adminSeeder --data '{\"action\":\"clear:posts\"}'",

@@ -93,7 +93,7 @@ npm run invoke:seed:dry
 npm run invoke:seed:create
 
 # Force delete everything in AWS
-npm run invoke:seed
+npm run invoke:seed:clear:all:force
 ```
 
 More `serverless invoke` examples and variants:
@@ -115,7 +115,7 @@ aws lambda invoke --function-name <FUNCTION_NAME> --payload '{"action":"create"}
 # Or use the npm helper scripts (preferred for consistent payloads)
 npm run invoke:seed:dry    # dry-run
 npm run invoke:seed:create # create
-npm run invoke:seed        # clear:all + force
+npm run invoke:seed:clear:all:force        # clear:all + force
 npm run invoke:seed:create:dry         # create (dry-run)
 npm run invoke:seed:clear:posts        # clear posts
 npm run invoke:seed:clear:posts:dry    # clear posts (dry-run)
