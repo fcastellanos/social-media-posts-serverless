@@ -8,6 +8,8 @@ const TABLE_NAME = process.env.PROPERTIES_TABLE_NAME || `${process.env.SERVERLES
 const client = new DynamoDBClient({ region: REGION });
 const docClient = DynamoDBDocumentClient.from(client);
 
+import { toProperty, toPost, toPostsListApi, toPostApi } from './transformers'
+
 // API shapes
 export type Property = {
   id: string;
@@ -38,29 +40,7 @@ export type PostApi = {
   scheduled_at?: string | null;
 };
 
-function mapPropertyItem(it: any): Property | null {
-  if (!it) return null;
-  return {
-    id: it.propertyId,
-    title: it.title || it.name || null,
-    address: it.address || null,
-    latitude: typeof it.latitude === 'number' ? it.latitude : null,
-    longitude: typeof it.longitude === 'number' ? it.longitude : null,
-    metadata: it.metadata || {},
-  };
-}
-
-function mapPostItem(it: any): Post | null {
-  if (!it) return null;
-  return {
-    id: it.postId,
-    title: it.title || it.name || null,
-    body: it.body ?? it.content ?? null,
-    photos: (it.photos || []).map((p: any) => ({ id: p.id, url: p.url })),
-    propertyId: it.propertyId || null,
-    scheduled_at: it.scheduledAt || null,
-  };
-}
+// mapping functions moved to src/lib/transformers.ts
 
 export async function listProperties(): Promise<Property[]> {
   const resp = await docClient.send(new QueryCommand({
@@ -71,7 +51,7 @@ export async function listProperties(): Promise<Property[]> {
     ExpressionAttributeValues: { ':ptype': 'PROPERTY' },
   }));
 
-  const props = (resp.Items || []).map(mapPropertyItem).filter((p): p is Property => p != null);
+  const props = (resp.Items || []).map(toProperty).filter((p): p is Property => p != null);
   return props;
 }
 
@@ -79,7 +59,7 @@ export async function getProperty(id: string): Promise<Property | null> {
   const PK = `PROPERTY#${id}`;
   const SK = `METADATA#${id}`;
   const resp = await docClient.send(new GetCommand({ TableName: TABLE_NAME, Key: { PK, SK } }));
-  return mapPropertyItem(resp.Item);
+  return toProperty(resp.Item);
 }
 
 export async function createProperty(data: { title: string; address: string; latitude: number; longitude: number; metadata?: any }, opts?: { id?: string }): Promise<Property> {
@@ -97,7 +77,7 @@ export async function createProperty(data: { title: string; address: string; lat
   };
 
   await docClient.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
-  return mapPropertyItem(item) as Property;
+  return toProperty(item) as Property;
 }
 
 export async function listPosts(): Promise<PostApi[]> {
@@ -109,9 +89,9 @@ export async function listPosts(): Promise<PostApi[]> {
     ExpressionAttributeValues: { ':ptype': 'POST' },
   }));
 
-  type PostItem = NonNullable<ReturnType<typeof mapPostItem>>;
+  type PostItem = NonNullable<ReturnType<typeof toPost>>;
 
-  const posts = (resp.Items || []).map(mapPostItem).filter((p): p is PostItem => p != null);
+  const posts = (resp.Items || []).map(toPost).filter((p): p is PostItem => p != null);
 
   // collect unique propertyIds and batch-get them
   const propIds = Array.from(new Set(posts.map(p => p.propertyId).filter(Boolean))) as string[];
@@ -120,20 +100,11 @@ export async function listPosts(): Promise<PostApi[]> {
     const keys = propIds.map(id => ({ PK: `PROPERTY#${id}`, SK: `METADATA#${id}` }));
     const batchResp: any = await docClient.send(new BatchGetCommand({ RequestItems: { [TABLE_NAME]: { Keys: keys } } }));
     const items = (batchResp.Responses && batchResp.Responses[TABLE_NAME]) || [];
-    const mapped = (items.map(mapPropertyItem) as Array<Property | null>).filter((x): x is Property => !!x);
+    const mapped = (items.map(toProperty) as Array<Property | null>).filter((x): x is Property => !!x);
     propertyMap = Object.fromEntries(mapped.map(p => [p.id, p]));
   }
 
-  return posts.map(p => ({
-    id: p.id,
-    title: p.title || null,
-    body: p.body,
-    photos: p.photos || [],
-    property: p.propertyId ? (propertyMap[p.propertyId]
-      ? { id: propertyMap[p.propertyId]!.id, address: propertyMap[p.propertyId]!.address, title: propertyMap[p.propertyId]!.title }
-      : { id: p.propertyId, title: null }) : null,
-    scheduled_at: p.scheduled_at || null,
-  }));
+  return toPostsListApi(posts, propertyMap)
 }
 
 export async function removeAllByEntity(entityType: string, opts?: { dryRun?: boolean }): Promise<number> {
@@ -196,20 +167,13 @@ export async function getPost(id: string): Promise<PostApi | null> {
   const PK = `POST#${id}`;
   const SK = `METADATA#${id}`;
   const resp = await docClient.send(new GetCommand({ TableName: TABLE_NAME, Key: { PK, SK } }));
-  const p = mapPostItem(resp.Item);
+  const p = toPost(resp.Item);
   if (!p) return null;
   if (p.propertyId) {
     const prop = await getProperty(p.propertyId);
-    return {
-      id: p.id,
-      title: p.title || null,
-      body: p.body,
-      photos: p.photos || [],
-      property: prop ? { id: prop.id, address: prop.address, title: prop.title } : { id: p.propertyId, title: null },
-      scheduled_at: p.scheduled_at,
-    };
+    return toPostApi(p, prop ? { id: prop.id, address: prop.address, title: prop.title } : { id: p.propertyId, title: null })
   }
-  return { id: p.id, title: p.title || null, body: p.body, photos: p.photos || [], property: null, scheduled_at: p.scheduled_at };
+  return toPostApi(p, null)
 }
 
 export async function createPost(data: { body: string; photos?: Array<{ url: string; id?: string }>; propertyId?: string; scheduled_at?: string }): Promise<PostApi> {
@@ -235,15 +199,14 @@ export async function createPost(data: { body: string; photos?: Array<{ url: str
   if (data.scheduled_at) item.scheduledAt = data.scheduled_at;
 
   await docClient.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
-
-  return {
+  const created = {
     id: item.postId,
     title: item.title || null,
     body: item.body,
     photos: item.photos || [],
-    property: item.propertyId ? { id: item.propertyId } : null,
     scheduled_at: item.scheduledAt || null,
-  };
+  }
+  return toPostApi(created, item.propertyId ? { id: item.propertyId } : null)
 }
 
 export default {
