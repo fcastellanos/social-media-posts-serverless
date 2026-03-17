@@ -5,6 +5,10 @@ app: aws-node-http-api-app
 # "service" is the name of this project. This will also be added to your AWS resource names.
 service: aws-node-http-api-project
 
+package:
+  exclude:
+    - web/**
+
 provider:
   name: aws
   runtime: nodejs24.x
