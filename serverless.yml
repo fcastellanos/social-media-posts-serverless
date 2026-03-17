@@ -54,11 +54,23 @@ functions:
       - httpApi:
           path: /posts
           method: get
+  getPost:
+    handler: src/handlers/getPost.handler
+    events:
+      - httpApi:
+          path: /posts/{id}
+          method: get
 
   adminSeeder:
     handler: src/handlers/adminSeeder.handler
     # No HTTP event; invoked manually via `serverless invoke -f adminSeeder` for safety
     # environment inherits provider.env
+  getProperty:
+    handler: src/handlers/getProperty.handler
+    events:
+      - httpApi:
+          path: /properties/{id}
+          method: get
 
 # Using Serverless v4 built-in esbuild (no external plugin)
 

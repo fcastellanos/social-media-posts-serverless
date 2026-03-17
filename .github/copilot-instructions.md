@@ -119,6 +119,24 @@ PR / Code review checklist
 - Are secrets removed from code and `.gitignore` present?
 - Are unit tests included & passing?
 
+Repository pattern guidance
+
+- Keep `src/lib/repository.ts` as the single data-access layer for DynamoDB access. Handlers should call repository functions rather than using the SDK directly.
+- Repository shape:
+  - Small, focused functions: `listProperties`, `getProperty`, `createProperty`, `listPosts`, `getPost`, `createPost`, `removeAllByEntity`, etc.
+  - Accept typed DTOs and return API-shaped objects (not raw DynamoDB items). Keep mapping functions (e.g. `mapPropertyItem`) private to the repository module.
+  - Keep repository functions deterministic and side-effect free where possible (return values, throw on errors). Do not read environment or perform I/O beyond DynamoDB calls in business functions.
+  - Encapsulate pagination and batching inside repository functions; handlers receive high-level results.
+  - For destructive or bulk operations provide `dryRun` or `opts` flags to make testing and safe runs straightforward.
+
+Example guidelines for new repository methods
+
+- Name: keep verb-first and entity-focused: `getPost(id)`, `listPosts(opts)`, `createProperty(data, opts)`.
+- Errors: throw JS `Error` (or typed subclasses) and let handlers map to HTTP responses.
+- Tests: unit-test repository logic with `@aws-sdk/lib-dynamodb` mocked; test mapping and edge cases (empty results, partial batches).
+
+When generating new handlers or tests, prefer calling existing repository functions rather than adding new low-level DynamoDB calls.
+
 Copilot / AI guidance (how to generate code here)
 
 - Prefer generating small functions and tests together. When adding infra, always update `serverless.yml`.
@@ -127,6 +145,14 @@ Copilot / AI guidance (how to generate code here)
   - A `json` response helper
   - Unit tests that mock DynamoDB
   - Example curl invocation in README or function docs
+
+Additional rule: tests required for every new Lambda
+
+- When a new Lambda/handler is added, create matching unit tests under `test/`.
+  - Tests should mock `@aws-sdk/lib-dynamodb` or `src/lib/repository` as appropriate.
+  - Handlers should be exercised for success, expected error responses (400/404), and at least one error path that returns 500.
+  - Name tests consistently: `test/<handlerName>.test.ts`.
+  - Keep tests small and focused; prefer mocking repository functions rather than the AWS SDK directly where the repository abstraction exists.
 
 Example prompts to use with Copilot/agent
 
