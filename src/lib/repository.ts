@@ -22,6 +22,7 @@ export type Photo = { id?: string; url?: string };
 
 export type Post = {
   id: string;
+  title?: string | null;
   body: string | null;
   photos: Photo[];
   propertyId?: string | null;
@@ -30,6 +31,7 @@ export type Post = {
 
 export type PostApi = {
   id: string;
+  title?: string | null;
   body: string | null;
   photos: Photo[];
   property: { id: string; address?: string | null } | null;
@@ -52,6 +54,7 @@ function mapPostItem(it: any): Post | null {
   if (!it) return null;
   return {
     id: it.postId,
+    title: it.title || it.name || null,
     body: it.body ?? it.content ?? null,
     photos: (it.photos || []).map((p: any) => ({ id: p.id, url: p.url })),
     propertyId: it.propertyId || null,
@@ -122,6 +125,7 @@ export async function listPosts(): Promise<PostApi[]> {
 
   return posts.map(p => ({
     id: p.id,
+    title: p.title || null,
     body: p.body,
     photos: p.photos || [],
     property: p.propertyId ? (propertyMap[p.propertyId] ? { id: propertyMap[p.propertyId]!.id, address: propertyMap[p.propertyId]!.address } : { id: p.propertyId }) : null,
@@ -193,9 +197,9 @@ export async function getPost(id: string): Promise<PostApi | null> {
   if (!p) return null;
   if (p.propertyId) {
     const prop = await getProperty(p.propertyId);
-    return { id: p.id, body: p.body, photos: p.photos || [], property: prop ? { id: prop.id, address: prop.address } : { id: p.propertyId }, scheduled_at: p.scheduled_at };
+    return { id: p.id, title: p.title || null, body: p.body, photos: p.photos || [], property: prop ? { id: prop.id, address: prop.address } : { id: p.propertyId }, scheduled_at: p.scheduled_at };
   }
-  return { id: p.id, body: p.body, photos: p.photos || [], property: null, scheduled_at: p.scheduled_at };
+  return { id: p.id, title: p.title || null, body: p.body, photos: p.photos || [], property: null, scheduled_at: p.scheduled_at };
 }
 
 export async function createPost(data: { body: string; photos?: Array<{ url: string; id?: string }>; propertyId?: string; scheduled_at?: string }): Promise<PostApi> {
@@ -206,6 +210,7 @@ export async function createPost(data: { body: string; photos?: Array<{ url: str
     entityType: 'POST',
     postId: id,
     body: data.body,
+    title: (data as any).title || null,
     createdAt: new Date().toISOString(),
   };
   // Allow callers to set an explicit id via a reserved field in data (internal use)
@@ -223,6 +228,7 @@ export async function createPost(data: { body: string; photos?: Array<{ url: str
 
   return {
     id: item.postId,
+    title: item.title || null,
     body: item.body,
     photos: item.photos || [],
     property: item.propertyId ? { id: item.propertyId } : null,

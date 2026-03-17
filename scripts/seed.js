@@ -46,6 +46,7 @@ async function ensureProperty(item) {
 async function ensurePost(post, propertyMap) {
   const id = stableId(post.title, post.propertyName || '');
   const payload = {
+    title: post.title,
     body: post.content,
     photos: post.photos ? post.photos.map(p => ({ id: stableId(post.title, p.url), url: p.url })) : undefined,
     propertyId: post.propertyName && propertyMap[post.propertyName] ? propertyMap[post.propertyName] : undefined,

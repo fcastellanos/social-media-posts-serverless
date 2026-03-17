@@ -41,7 +41,7 @@ export const handler = async (event: any) => {
       for (const post of seeds.examplePosts || []) {
         const propertyId = propertyMap[post.propertyName];
         const id = stableId(post.title, propertyId || '');
-        const postPayload: any = { body: post.content, photos: post.photos || [], propertyId };
+        const postPayload: any = { title: post.title, body: post.content, photos: post.photos || [], propertyId };
         if (dryRun) {
           console.log('DRY RUN - post', { id, ...postPayload });
           continue;

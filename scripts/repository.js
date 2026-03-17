@@ -69,6 +69,7 @@ async function createPost(data, opts = {}) {
     entityType: 'POST',
     postId: id,
     body: data.body,
+    title: data.title || null,
     createdAt: new Date().toISOString(),
   };
   if (data.propertyId) item.propertyId = data.propertyId;

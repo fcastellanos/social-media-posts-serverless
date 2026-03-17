@@ -185,6 +185,96 @@
           "caption": "Bright, comfortable apartment living in a convenient neighborhood setting."
         }
       ]
+    },
+    {
+      "title": "Boulevard Living in Northlake Heights",
+      "content": "Meet The Willowline at 2108 N Cedarbank Blvd—set on a charming boulevard in Northlake Heights (60618), where classic neighborhood character meets modern conveniences. Enjoy nearby walking paths and easy access to transit.",
+      "propertyName": "The Willowline",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    },
+    {
+      "title": "Quiet Street, City-Convenience in 60618",
+      "content": "Welcome to Lakeview Terrace Homes at 722 E Ashford Ln in Northlake Heights—set on a calm, neighbor-friendly street with easy access to parks and local shops.",
+      "propertyName": "Lakeview Terrace Homes",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1531879143209-4aa0b1abf6d1?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    },
+    {
+      "title": "Northlake Heights Convenience, 60618 Charm",
+      "content": "Discover Crestwood Lofts at 1601 N Briarstone Rd—set in a quiet, tree-lined Northlake Heights neighborhood with the city within easy reach.",
+      "propertyName": "Crestwood Lofts",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    },
+    {
+      "title": "Comfortable Harbor Living",
+      "content": "Harbor Point Residences at 905 W Silverleaf Dr offers a serene harbor-side lifestyle with modern amenities and quick access to dining and transit.",
+      "propertyName": "Harbor Point Residences",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    },
+    {
+      "title": "Fulton Grove: Green & Quiet",
+      "content": "Fulton Grove Apartments on 2480 N Meadowrun Ct provides green common areas and a peaceful community close to shopping and services.",
+      "propertyName": "Fulton Grove Apartments",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    },
+    {
+      "title": "Alderstone — Cozy Urban Living",
+      "content": "The Alderstone at 1317 W Oakrun Ave offers cozy, modern units and easy access to neighborhood parks and cafes.",
+      "propertyName": "The Alderstone",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1549187774-b4bd0a13f5a5?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    },
+    {
+      "title": "Gaslamp Lofts: Downtown Style",
+      "content": "Gaslamp Lofts at 456 5th Ave puts you at the heart of downtown San Diego with walkable restaurants and nightlife.",
+      "propertyName": "Gaslamp Lofts",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    },
+    {
+      "title": "La Jolla Cove Living",
+      "content": "La Jolla Cove Apartments near the coast offer relaxed seaside living and easy beach access.",
+      "propertyName": "La Jolla Cove Apartments",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1505692794402-8b34f0a3a1e7?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
+    },
+    {
+      "title": "Pacific Beach Residences — Surf & Sand",
+      "content": "Pacific Beach Residences at 789 Mission Blvd place you steps from the beach with lively neighborhood dining and shops.",
+      "propertyName": "Pacific Beach Residences",
+      "photos": [
+        {
+          "url": "https://images.unsplash.com/photo-1501889088093-0c99b3d6a2dd?auto=format&fit=crop&w=1600&q=80"
+        }
+      ]
     }
   ]
 }

@@ -39,3 +39,25 @@ coverage/
 # yarn.lock
 node_modules
 .serverless
+
+# Web frontend / Vite
+# (kept here to consolidate ignores for the web/ package)
+logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+dist-ssr
+*.local
+
+# keep IDE extensions file if present
+!.vscode/extensions.json
+
+# Visual Studio / Windows project files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
