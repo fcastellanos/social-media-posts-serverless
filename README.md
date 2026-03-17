@@ -172,6 +172,21 @@ Notes:
 - The admin seeder Lambda runs in AWS and inherits IAM permissions from the function role; prefer this for operations against the deployed table.
 - The local script uses the AWS SDK default provider chain; ensure your shell has credentials (`AWS_PROFILE`, `AWS_ACCESS_KEY_ID`, etc.) when running non-dry operations locally.
 
+## Frontend
+
+This repository includes a small frontend app under `web/` used for local development and previewing the `/posts` endpoint. It is intentionally kept out of Lambda artifacts (see `serverless.yml` `package.exclude`).
+
+- **Stack:** Vite + React + TypeScript
+- **Source:** `web/src/` (components, hooks, styles)
+- **Dev server:** `cd web && npm install && npm run dev`
+- **Build:** `cd web && npm run build` — output is placed in `web/dist`
+- **Env:** frontend reads `VITE_API_BASE` (for production builds). During local development the client uses relative paths so `vite` dev proxy can forward `/posts` to your API.
+- **Dev proxy:** see `web/vite.config.ts` for proxy rules that forward `/posts` and `/properties` to the backend during development.
+
+Screenshot (preview of the Posts feed):
+
+![Posts screenshot](web/public/posts-screenshot.png)
+
 Notes
 
 - DynamoDB table: created by the CloudFormation template in `serverless.yml`. The table name is `${self:service}-properties-table`. The `PROPERTIES_TABLE_NAME` environment variable is set for Lambdas.
