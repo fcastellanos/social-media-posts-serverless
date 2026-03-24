@@ -93,6 +93,93 @@ curl -sS -X POST https://<api-id>.execute-api.<region>.amazonaws.com/properties 
   -d '{"title":"My Place","address":"123 Main St","latitude":1,"longitude":2}'
 ```
 
+## GraphQL (AppSync)
+
+This project also exposes a GraphQL API using AWS AppSync.
+
+- GraphQL is an additional read interface that reuses the same repository/data layer.
+
+### Current GraphQL operations
+
+Defined in `schema.graphql`:
+
+- `listProperties: PropertiesResult!`
+- `getProperty(id: ID!): Property`
+- `listPosts: PostsResult!`
+- `getPost(id: ID!): Post`
+
+### Get the GraphQL endpoint URL
+
+Option 1: AWS Console
+
+- Open AppSync in AWS Console
+- Select API: `<service>-graphql`
+- Copy the GraphQL endpoint URL
+
+Option 2: AWS CLI
+
+```bash
+# Replace with your deployed AppSync API name if needed
+API_NAME=aws-node-http-api-project-graphql
+
+aws appsync list-graphql-apis \
+  --query "graphqlApis[?name=='${API_NAME}'].uris.GRAPHQL | [0]" \
+  --output text
+```
+
+### Get the GraphQL API key
+
+This AppSync config uses `API_KEY` auth, so requests need `x-api-key`.
+
+```bash
+API_NAME=aws-node-http-api-project-graphql
+
+API_ID=$(aws appsync list-graphql-apis \
+  --query "graphqlApis[?name=='${API_NAME}'].apiId | [0]" \
+  --output text)
+
+API_KEY=$(aws appsync list-api-keys \
+  --api-id "$API_ID" \
+  --query "apiKeys[0].id" \
+  --output text)
+
+echo "API_ID=$API_ID"
+echo "API_KEY=$API_KEY"
+```
+
+### Call GraphQL with curl
+
+```bash
+GRAPHQL_URL="https://<your-appsync-id>.appsync-api.<region>.amazonaws.com/graphql"
+GRAPHQL_API_KEY="<your-api-key>"
+
+curl -sS "$GRAPHQL_URL" \
+  -H 'Content-Type: application/json' \
+  -H "x-api-key: $GRAPHQL_API_KEY" \
+  -d '{
+    "query":"query ListPosts { listPosts { items { id title body scheduled_at property { id title address } photos { id url } } } }"
+  }'
+```
+
+### Call GraphQL from Postman
+
+1. Create a `POST` request to your AppSync GraphQL URL.
+2. Add headers:
+   - `Content-Type: application/json`
+   - `x-api-key: <your-api-key>`
+3. Use `Body -> raw -> JSON` and send:
+
+```json
+{
+  "query": "query GetProperty($id: ID!) { getProperty(id: $id) { id title address latitude longitude } }",
+  "variables": {
+    "id": "<PROPERTY_ID>"
+  }
+}
+```
+
+If you get `Unauthorized`, verify the API key is active and that you are calling the AppSync URL (not the HTTP API URL).
+
 ## Seeding & Clearing Data
 
 - The project provides two safe ways to run seeds:
