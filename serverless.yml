@@ -64,7 +64,6 @@ functions:
       - httpApi:
           path: /posts/{id}
           method: get
-
   adminSeeder:
     handler: src/handlers/adminSeeder.handler
     # No HTTP event; invoked manually via `serverless invoke -f adminSeeder` for safety
@@ -75,6 +74,35 @@ functions:
       - httpApi:
           path: /properties/{id}
           method: get
+  graphqlResolver:
+    handler: src/handlers/graphqlResolver.handler
+
+plugins:
+  - serverless-appsync-plugin
+
+appSync:
+  name: ${self:service}-graphql
+  schema: schema.graphql
+  authentication:
+    type: API_KEY
+  dataSources:
+    graphqlLambda:
+      type: AWS_LAMBDA
+      config:
+        functionName: graphqlResolver
+  resolvers:
+    Query.listProperties:
+      kind: UNIT
+      dataSource: graphqlLambda
+    Query.getProperty:
+      kind: UNIT
+      dataSource: graphqlLambda
+    Query.listPosts:
+      kind: UNIT
+      dataSource: graphqlLambda
+    Query.getPost:
+      kind: UNIT
+      dataSource: graphqlLambda
 
 # Using Serverless v4 built-in esbuild (no external plugin)
 
